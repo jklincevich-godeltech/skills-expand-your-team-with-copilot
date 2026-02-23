@@ -568,6 +568,17 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <div class="share-container">
+          <button class="share-button" aria-label="Share this activity">
+            <span>🔗</span> Share
+          </button>
+          <div class="share-dropdown hidden">
+            <a class="share-option share-twitter" href="#" aria-label="Share on X (Twitter)">𝕏 X (Twitter)</a>
+            <a class="share-option share-whatsapp" href="#" aria-label="Share on WhatsApp">💬 WhatsApp</a>
+            <a class="share-option share-email" href="#" aria-label="Share via Email">✉️ Email</a>
+            <button class="share-option share-copy" aria-label="Copy link to clipboard">📋 Copy Link</button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -586,6 +597,71 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Set up share button
+    const shareButton = activityCard.querySelector(".share-button");
+    const shareDropdown = activityCard.querySelector(".share-dropdown");
+    const shareText = `Check out "${name}" at Mergington High School!\n${details.description}\nSchedule: ${formattedSchedule}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(name)}`;
+
+    shareButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      // Use native Web Share API if available (mobile/modern browsers)
+      if (navigator.share) {
+        navigator.share({
+          title: name,
+          text: shareText,
+          url: shareUrl,
+        }).catch(() => {
+          showMessage("Could not share. Please try another option.", "error");
+        });
+        return;
+      }
+      // Otherwise toggle the dropdown
+      const isHidden = shareDropdown.classList.contains("hidden");
+      // Close all other open dropdowns first
+      document.querySelectorAll(".share-dropdown:not(.hidden)").forEach((el) => {
+        el.classList.add("hidden");
+      });
+      if (isHidden) {
+        shareDropdown.classList.remove("hidden");
+      }
+    });
+
+    // Share option: Twitter
+    activityCard.querySelector(".share-twitter").addEventListener("click", (event) => {
+      event.preventDefault();
+      const tweetText = encodeURIComponent(`${shareText}\n${shareUrl}`);
+      window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, "_blank", "noopener,noreferrer");
+      shareDropdown.classList.add("hidden");
+    });
+
+    // Share option: WhatsApp
+    activityCard.querySelector(".share-whatsapp").addEventListener("click", (event) => {
+      event.preventDefault();
+      const waText = encodeURIComponent(`${shareText}\n${shareUrl}`);
+      window.open(`https://wa.me/?text=${waText}`, "_blank", "noopener,noreferrer");
+      shareDropdown.classList.add("hidden");
+    });
+
+    // Share option: Email
+    activityCard.querySelector(".share-email").addEventListener("click", (event) => {
+      event.preventDefault();
+      const subject = encodeURIComponent(`Check out: ${name}`);
+      const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
+      window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+      shareDropdown.classList.add("hidden");
+    });
+
+    // Share option: Copy link
+    activityCard.querySelector(".share-copy").addEventListener("click", () => {
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+        showMessage("Activity details copied to clipboard!", "success");
+      }).catch(() => {
+        showMessage("Could not copy to clipboard.", "error");
+      });
+      shareDropdown.classList.add("hidden");
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -853,6 +929,13 @@ document.addEventListener("DOMContentLoaded", () => {
       showMessage("Failed to sign up. Please try again.", "error");
       console.error("Error signing up:", error);
     }
+  });
+
+  // Close share dropdowns when clicking outside
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".share-dropdown:not(.hidden)").forEach((el) => {
+      el.classList.add("hidden");
+    });
   });
 
   // Expose filter functions to window for future UI control
