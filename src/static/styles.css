@@ -619,11 +619,61 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #user-status {
   display: flex;
   align-items: center;
+}
+
+/* Dark mode toggle button */
+#dark-mode-toggle {
+  padding: 4px 10px;
+  font-size: 1rem;
+}
+
+/* ========== Dark Mode ========== */
+body.dark-mode {
+  --background: #121212;
+  --surface: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --border: #333333;
+  --border-light: #2a2a2a;
+  --border-focus: #444444;
+  --primary: #3949ab;
+  --primary-light: #5c6bc0;
+  --primary-dark: #1a237e;
+  --success-light: #1b3a1c;
+  --warning-light: #3a2e00;
+  --error-light: #3a0a0a;
+  --info-light: #092a30;
+}
+
+body.dark-mode .search-box input {
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+body.dark-mode .activity-tag {
+  background: #2a2d4e !important;
+  color: #8c9eff !important;
+}
+
+body.dark-mode .modal-content {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+body.dark-mode input,
+body.dark-mode textarea {
+  background-color: var(--border-light);
+  color: var(--text-primary);
+  border-color: var(--border);
 }
 
 #user-info {
